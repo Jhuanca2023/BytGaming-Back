@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>ByteGaming.re</groupId>
 	<artifactId>BytGaminG</artifactId>
-	<version>ByteGaming</version>
+	<version>1.0.0</version>
 	<name>BytGaminG</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
@@ -176,6 +176,7 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+					<finalName>app</finalName>
 				</configuration>
 			</plugin>
 		</plugins>

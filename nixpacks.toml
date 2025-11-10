@@ -1,0 +1,9 @@
+[phases.setup]
+nixPkgs = ["maven", "jdk17"]
+
+[phases.install]
+cmds = ["mvn clean package -DskipTests -B"]
+
+[start]
+cmd = "java -jar BytGaming/target/app.jar"
+

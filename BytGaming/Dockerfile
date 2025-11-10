@@ -1,16 +1,35 @@
 FROM maven:3.8.6-eclipse-temurin-17 AS build
 WORKDIR /workspace
+
+# Copy pom.xml first for better caching
 COPY pom.xml .
 COPY .mvn .mvn
 COPY mvnw .
-RUN ./mvnw dependency:go-offline -B
+COPY mvnw.cmd .
+
+# Make mvnw executable
+RUN chmod +x mvnw || true
+
+# Download dependencies
+RUN ./mvnw dependency:go-offline -B || mvn dependency:go-offline -B
+
+# Copy source code
 COPY src ./src
-RUN ./mvnw clean package -DskipTests
+
+# Build application
+RUN ./mvnw clean package -DskipTests -B || mvn clean package -DskipTests -B
+
+# Verify JAR was created
+RUN ls -la target/*.jar || echo "JAR file not found in target directory"
 
 FROM eclipse-temurin:17-jre-alpine
 VOLUME /tmp
 RUN apk add --no-cache curl
 WORKDIR /app
-COPY --from=build /workspace/target/*.jar app.jar
+
+# Copy JAR from build stage
+COPY --from=build /workspace/target/app.jar app.jar
+
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","/app.jar"]
+
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
