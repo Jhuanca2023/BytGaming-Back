@@ -1,0 +1,74 @@
+server:
+  port: 8081
+
+spring:
+  cloud:
+    gateway:
+      csrf:
+        enabled: false
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:4200"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+      routes:
+        # Autenticación:
+        - id: auth
+          uri: ${BACKEND_URI:http://backend:8080}
+          predicates:
+            - Path=/auth/**
+
+        # Carrito:
+        - id: cart
+          uri: ${BACKEND_URI:http://backend:8080}
+          predicates:
+            - Path=/api/cart/**
+
+        # Productos:
+        - id: products
+          uri: ${BACKEND_URI:http://backend:8080}
+          predicates:
+            - Path=/api/products/**
+
+        # Categorías:
+        - id: category
+          uri: ${BACKEND_URI:http://backend:8080}
+          predicates:
+            - Path=/api/category/**
+
+        # Proveedores:
+        - id: suppliers
+          uri: ${BACKEND_URI:http://backend:8080}
+          predicates:
+            - Path=/api/suppliers/**
+
+        # Staff:
+        - id: staff
+          uri: ${BACKEND_URI:http://backend:8080}
+          predicates:
+            - Path=/api/staff/**
+
+        # Kardex:
+        - id: kardex
+          uri: ${BACKEND_URI:http://backend:8080}
+          predicates:
+            - Path=/api/kardex/**
+
+        # Órdenes:
+        - id: orders
+          uri: ${BACKEND_URI:http://backend:8080}
+          predicates:
+            - Path=/api/orders/**
+
+        # Direcciones de usuario:
+        - id: addresses
+          uri: ${BACKEND_URI:http://backend:8080}
+          predicates:
+            - Path=/api/addresses/**

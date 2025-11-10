@@ -1,0 +1,64 @@
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: bytgaming-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: bygaming
+      MYSQL_USER: bytgaming
+      MYSQL_PASSWORD: bytgaming123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bytgaming-network
+
+  backend:
+    build:
+      context: ./BytGaming
+      dockerfile: Dockerfile
+    container_name: bytgaming-backend
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/bygaming?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_USER: bytgaming
+      DB_PASSWORD: bytgaming123
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - bytgaming-network
+    restart: unless-stopped
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: bytgaming-gateway
+    environment:
+      BACKEND_URI: http://backend:8080
+    ports:
+      - "8081:8081"
+    depends_on:
+      backend:
+        condition: service_started
+    networks:
+      - bytgaming-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+
+networks:
+  bytgaming-network:
+    driver: bridge
+
