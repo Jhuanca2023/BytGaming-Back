@@ -1,0 +1,35 @@
+# Render Configuration
+# Este archivo permite configurar Render directamente desde el repositorio
+
+services:
+  # Backend Spring Boot
+  - type: web
+    name: bytgaming-backend
+    env: docker
+    dockerfilePath: ./BytGaming/Dockerfile
+    dockerContext: ./BytGaming
+    plan: free
+    region: oregon
+    envVars:
+      - key: DB_URL
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: SECURITY_JWT_KEY_PRIVATE
+        value: cb0bf0cb4921bb9602e27ce65b34c339ef926f2d4a982e299924d23baca18a43
+      - key: SECURITY_JWT_USER_GENERATOR
+        value: AUTH0JWT-BACKEND
+      - key: PORT
+        value: 10000
+    healthCheckPath: /v3/api-docs
+
+databases:
+  # MySQL Database
+  - name: bytgaming-db
+    databaseName: bytgaming
+    user: bytgaming
+    plan: free
+    region: oregon
+
