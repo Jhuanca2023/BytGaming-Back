@@ -42,7 +42,19 @@ public class UsersController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDto> login(@RequestBody @Valid AuthLoginRequestDto userRequest){
-        return new ResponseEntity<>(this.userDetailService.loginUser(userRequest), HttpStatus.OK);
+        try {
+            AuthResponseDto response = this.userDetailService.loginUser(userRequest);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (org.springframework.security.authentication.BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponseDto(null, "Credenciales inválidas", null, false));
+        } catch (org.springframework.security.core.userdetails.UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponseDto(null, "Usuario no encontrado", null, false));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AuthResponseDto(null, "Error al iniciar sesión: " + e.getMessage(), null, false));
+        }
     }
 
     @GetMapping
