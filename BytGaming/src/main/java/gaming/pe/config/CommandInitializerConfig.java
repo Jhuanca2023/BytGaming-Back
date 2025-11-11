@@ -59,15 +59,12 @@ public class CommandInitializerConfig implements CommandLineRunner {
         // Crear usuarios iniciales
         if (userRepository.count() == 0) {
             RoleEntity adminRole = roleRepository
-                    .findFirstByRoleEnumIn(List.of(String.valueOf(RoleEnum.ADMIN)))
-                    .get(0);
+                    .findByRoleEnum(RoleEnum.ADMIN)
+                    .orElseThrow(() -> new RuntimeException("Admin role not found"));
 
             RoleEntity userRole = roleRepository
-                    .findFirstByRoleEnumIn(List.of(String.valueOf(RoleEnum.USER)))
-                    .get(0);
-
-
-//            RoleEntity userRole = roleRepository.findRoleEntitiesByRoleEnumIn(RoleEnum.USER.name());
+                    .findByRoleEnum(RoleEnum.USER)
+                    .orElseThrow(() -> new RuntimeException("User role not found"));
 
             UserEntity admin = UserEntity.builder()
                     .email("admin@example.com")
@@ -75,6 +72,10 @@ public class CommandInitializerConfig implements CommandLineRunner {
                     .name("Roger")
                     .lastName("Concepción")
                     .role(adminRole)
+                    .isEnabled(true)
+                    .accountNoLocked(true)
+                    .accountNoExpired(true)
+                    .credentialNoExpired(true)
                     .build();
             UserEntity admin2 = UserEntity.builder()
                     .email("user1@example.com")
@@ -82,11 +83,19 @@ public class CommandInitializerConfig implements CommandLineRunner {
                     .role(adminRole)
                     .name("Jhon")
                     .lastName("Rodriguez")
+                    .isEnabled(true)
+                    .accountNoLocked(true)
+                    .accountNoExpired(true)
+                    .credentialNoExpired(true)
                     .build();
             UserEntity user2 = UserEntity.builder()
                     .email("user2@example.com")
                     .password(passwordEncoder.encode("admin123"))
                     .role(userRole)
+                    .isEnabled(true)
+                    .accountNoLocked(true)
+                    .accountNoExpired(true)
+                    .credentialNoExpired(true)
                     .build();
 
             userRepository.save(admin);
