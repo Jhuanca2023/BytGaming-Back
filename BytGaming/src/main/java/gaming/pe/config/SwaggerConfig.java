@@ -34,8 +34,8 @@ import org.springframework.http.HttpHeaders;
                         url = "http://localhost:8080"
                 ),
                 @Server(
-                        description = "Production Server",
-                        url = ""
+                        description = "Production Server (Render)",
+                        url = "https://bytgaming-backend.onrender.com"
                 )
 
         },
