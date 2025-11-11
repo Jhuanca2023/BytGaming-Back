@@ -3,24 +3,26 @@ WORKDIR /workspace
 
 # Copy pom.xml first for better caching
 COPY pom.xml .
-COPY .mvn .mvn
-COPY mvnw .
-COPY mvnw.cmd .
-
-# Make mvnw executable
-RUN chmod +x mvnw || true
 
 # Download dependencies
-RUN ./mvnw dependency:go-offline -B || mvn dependency:go-offline -B
+RUN mvn dependency:go-offline -B
 
 # Copy source code
 COPY src ./src
 
 # Build application
-RUN ./mvnw clean package -DskipTests -B || mvn clean package -DskipTests -B
+RUN mvn clean package -DskipTests -B
 
 # Verify JAR was created
-RUN ls -la target/*.jar || echo "JAR file not found in target directory"
+RUN ls -la target/ && \
+    if [ ! -f target/app.jar ]; then \
+        echo "ERROR: JAR file not found!" && \
+        echo "Files in target directory:" && \
+        ls -la target/ && \
+        exit 1; \
+    fi && \
+    echo "SUCCESS: JAR file found" && \
+    ls -lh target/app.jar
 
 FROM eclipse-temurin:17-jre-alpine
 VOLUME /tmp
